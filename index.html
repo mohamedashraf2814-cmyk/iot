@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IoT Mid Quiz — ITN702</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#fff;--text:#1b1f2a;--muted:#667085;--line:#e3e6ee;
+  --accent:#2457d6;--accent-soft:#e8eefc;--ok:#157a43;--ok-bg:#e4f6ec;--bad:#b42318;--bad-bg:#fdeceb;--warn-bg:#fff6df;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#10131a;--card:#181c26;--text:#e8ebf2;--muted:#98a2b3;--line:#2a3040;
+  --accent:#7aa2ff;--accent-soft:#1f2a47;--ok:#4cd68a;--ok-bg:#123324;--bad:#ff8a80;--bad-bg:#3a1a19;--warn-bg:#352c12;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.4rem;margin:8px 0 2px}
+.sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.modes{display:grid;gap:10px;margin:14px 0}
+button{font:inherit;cursor:pointer}
+.mode{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;text-align:start}
+.mode:hover{border-color:var(--accent)}
+.mode small{color:var(--muted)}
+label.chk{display:flex;gap:8px;align-items:center;margin-top:8px;color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+.bar>i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-size:.8rem;font-weight:600}
+.q-en{font-size:1.1rem;font-weight:600;margin:12px 0 4px;direction:ltr;text-align:left}
+.q-ar{color:var(--muted);margin:0 0 14px}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1.5px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;text-align:left;direction:ltr;width:100%}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .box{flex:none;width:20px;height:20px;border:2px solid var(--muted);border-radius:5px;display:grid;place-items:center;font-size:.8rem;line-height:1}
+.opt.radio .box{border-radius:50%}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .box{border-color:var(--accent);background:var(--accent);color:#fff}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.ok .box{border-color:var(--ok);background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.opt.bad .box{border-color:var(--bad);background:var(--bad);color:#fff}
+.opt.miss{border-style:dashed;border-color:var(--ok);background:var(--warn-bg)}
+.opt:disabled{cursor:default;opacity:1}
+.tf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tf .opt{justify-content:center;font-weight:600;font-size:1.05rem}
+.hint{color:var(--muted);font-size:.85rem;margin:0 0 10px}
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{padding:11px 20px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-weight:600}
+.btn.sec{background:var(--accent-soft);color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.feedback{margin-top:16px;padding:14px;border-radius:10px;border:1px solid var(--line)}
+.feedback.ok{background:var(--ok-bg);border-color:var(--ok)}
+.feedback.bad{background:var(--bad-bg);border-color:var(--bad)}
+.feedback b.t{display:block;margin-bottom:4px}
+.feedback .ans{margin:6px 0;direction:ltr;text-align:left;font-size:.95rem}
+.score{font-size:2.4rem;font-weight:800;text-align:center;margin:6px 0}
+.review{margin-top:14px;display:grid;gap:8px}
+.rv{padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-size:.92rem}
+.rv.bad{background:var(--bad-bg);border-color:var(--bad)}
+.rv .e{direction:ltr;text-align:left;font-weight:600}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>IoT Mid Quiz — ITN702</h1>
+  <p class="sub">كويز تفاعلي: صح/غلط + اختيار متعدد (Multiple Select) — الشرح بيظهر بعد ما تجاوب.</p>
+
+  <div id="home" class="card">
+    <b>اختار نوع الأسئلة:</b>
+    <div class="modes">
+      <button class="mode" data-mode="all"><span>كل الأسئلة</span><small id="n-all"></small></button>
+      <button class="mode" data-mode="tf"><span>صح / غلط (True / False)</span><small id="n-tf"></small></button>
+      <button class="mode" data-mode="msq"><span>اختيار متعدد (MSQ)</span><small id="n-msq"></small></button>
+    </div>
+    <label class="chk"><input type="checkbox" id="shuffle"> ترتيب عشوائي للأسئلة</label>
+  </div>
+
+  <div id="quiz" class="card hidden">
+    <div class="meta"><span id="count"></span><span id="live"></span></div>
+    <div class="bar"><i id="prog"></i></div>
+    <span class="badge" id="badge"></span>
+    <div class="q-en" id="qen"></div>
+    <p class="q-ar" id="qar"></p>
+    <p class="hint hidden" id="hint">اختار كل الإجابات الصحيحة، وبعدين دوس «تأكيد».</p>
+    <div id="opts"></div>
+    <div id="fb"></div>
+    <div class="actions">
+      <button class="btn" id="check">تأكيد الإجابة</button>
+      <button class="btn hidden" id="next">التالي ←</button>
+    </div>
+  </div>
+
+  <div id="result" class="card hidden">
+    <div class="score" id="final"></div>
+    <p class="sub" id="finalmsg" style="text-align:center"></p>
+    <div class="actions" style="justify-content:center">
+      <button class="btn" id="retryWrong">راجع الأخطاء بس</button>
+      <button class="btn sec" id="restart">ابدأ من الأول</button>
+    </div>
+    <div class="review" id="review"></div>
+  </div>
+</div>
+
+<script src="questions.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const ALL = window.QUESTIONS;
+const L = i => String.fromCharCode(65 + i);
+let list = [], idx = 0, score = 0, answered = false, sel = new Set(), wrong = [];
+
+$("n-all").textContent = ALL.length + " سؤال";
+$("n-tf").textContent  = ALL.filter(q => q.type === "tf").length + " سؤال";
+$("n-msq").textContent = ALL.filter(q => q.type === "msq").length + " سؤال";
+
+document.querySelectorAll(".mode").forEach(b => b.onclick = () => {
+  const m = b.dataset.mode;
+  start(ALL.filter(q => m === "all" || q.type === m));
+});
+$("restart").onclick = () => { show("home"); };
+$("retryWrong").onclick = () => start(wrong.map(w => w.q));
+
+function show(id){ ["home","quiz","result"].forEach(x => $(x).classList.toggle("hidden", x !== id)); window.scrollTo(0,0); }
+
+function start(qs){
+  list = qs.slice();
+  if ($("shuffle").checked) list.sort(() => Math.random() - .5);
+  idx = 0; score = 0; wrong = [];
+  if (!list.length) return show("home");
+  show("quiz"); render();
+}
+
+function render(){
+  const q = list[idx]; answered = false; sel = new Set();
+  $("count").textContent = `سؤال ${idx + 1} من ${list.length}`;
+  $("live").textContent = `النتيجة: ${score}`;
+  $("prog").style.width = (idx / list.length * 100) + "%";
+  $("badge").textContent = q.type === "tf" ? "True / False — صح أم خطأ" : "MSQ — اختيار متعدد";
+  $("qen").textContent = q.q; $("qar").textContent = q.ar;
+  $("hint").classList.toggle("hidden", q.type !== "msq");
+  $("fb").innerHTML = "";
+  $("next").classList.add("hidden");
+  const o = $("opts"); o.innerHTML = "";
+  if (q.type === "tf"){
+    o.className = "tf";
+    [[true,"True ✔ صح"],[false,"False ✘ غلط"]].forEach(([v,t]) => {
+      const b = document.createElement("button");
+      b.className = "opt"; b.textContent = t; b.dataset.v = v;
+      b.onclick = () => submitTF(v);
+      o.appendChild(b);
+    });
+    $("check").classList.add("hidden");
+  } else {
+    o.className = "opts";
+    q.options.forEach((t,i) => {
+      const b = document.createElement("button");
+      b.className = "opt"; b.dataset.i = i;
+      b.innerHTML = `<span class="box"></span><span></span>`;
+      b.lastChild.textContent = `${L(i)}. ${t}`;
+      b.onclick = () => { if (answered) return;
+        sel.has(i) ? sel.delete(i) : sel.add(i);
+        b.classList.toggle("sel", sel.has(i));
+        b.firstChild.textContent = sel.has(i) ? "✓" : "";
+        $("check").disabled = sel.size === 0;
+      };
+      o.appendChild(b);
+    });
+    $("check").classList.remove("hidden"); $("check").disabled = true;
+  }
+}
+
+function feedback(ok, q, extra){
+  $("fb").innerHTML = `<div class="feedback ${ok ? "ok" : "bad"}">
+    <b class="t">${ok ? "إجابة صحيحة 🎉" : "إجابة غلط"}</b>
+    ${extra || ""}<div style="margin-top:6px"></div></div>`;
+  $("fb").querySelector(".feedback > div:last-child").textContent = "الشرح: " + q.exp;
+  $("next").classList.remove("hidden");
+  $("next").textContent = idx === list.length - 1 ? "شوف النتيجة" : "التالي ←";
+  $("live").textContent = `النتيجة: ${score}`;
+}
+
+function submitTF(v){
+  if (answered) return; answered = true;
+  const q = list[idx], ok = v === q.answer;
+  document.querySelectorAll("#opts .opt").forEach(b => {
+    b.disabled = true;
+    const bv = b.dataset.v === "true";
+    if (bv === q.answer) b.classList.add("ok");
+    else if (bv === v) b.classList.add("bad");
+  });
+  if (ok) score++; else wrong.push({q, picked: v});
+  feedback(ok, q, `<div class="ans">Correct answer: <b>${q.answer ? "True" : "False"}</b></div>`);
+}
+
+$("check").onclick = () => {
+  if (answered || !sel.size) return; answered = true;
+  const q = list[idx], correct = new Set(q.answer);
+  const ok = sel.size === correct.size && [...sel].every(i => correct.has(i));
+  document.querySelectorAll("#opts .opt").forEach(b => {
+    const i = +b.dataset.i; b.disabled = true; b.classList.remove("sel");
+    const box = b.firstChild;
+    if (correct.has(i) && sel.has(i)) { b.classList.add("ok"); box.textContent = "✓"; }
+    else if (correct.has(i))          { b.classList.add("miss"); box.textContent = "✓"; }
+    else if (sel.has(i))              { b.classList.add("bad"); box.textContent = "✕"; }
+  });
+  $("check").classList.add("hidden");
+  if (ok) score++; else wrong.push({q, picked: [...sel]});
+  const ans = q.answer.map(i => L(i)).join(", ");
+  feedback(ok, q, `<div class="ans">Correct answers: <b>${ans}</b></div>` +
+    (ok ? "" : `<div class="ans" style="color:var(--muted)">الخيارات الخضراء المنقطة = صح وانت نسيتها · الحمراء = اخترتها وهي غلط</div>`));
+};
+
+$("next").onclick = () => {
+  idx++;
+  if (idx >= list.length) return finish();
+  render();
+};
+
+function finish(){
+  show("result");
+  const pct = Math.round(score / list.length * 100);
+  $("final").textContent = `${score} / ${list.length}  (${pct}%)`;
+  $("finalmsg").textContent = pct === 100 ? "ممتاز! كل الإجابات صح 🏆" : pct >= 80 ? "شاطر! راجع الأخطاء وخلاص 👏" : pct >= 50 ? "كويس، بس محتاج مراجعة بسيطة 📚" : "محتاج تذاكر تاني وتحاول 💪";
+  $("retryWrong").classList.toggle("hidden", wrong.length === 0);
+  const r = $("review"); r.innerHTML = "";
+  wrong.forEach(w => {
+    const d = document.createElement("div"); d.className = "rv bad";
+    const a = w.q.type === "tf" ? (w.q.answer ? "True" : "False") : w.q.answer.map(i => w.q.options[i]).join(" | ");
+    d.innerHTML = `<div class="e"></div><div style="margin-top:4px"></div><div style="margin-top:4px;color:var(--muted)"></div>`;
+    d.children[0].textContent = w.q.q;
+    d.children[1].textContent = "الإجابة الصحيحة: " + a;
+    d.children[2].textContent = w.q.exp;
+    r.appendChild(d);
+  });
+}
+</script>
+</body>
+</html>
